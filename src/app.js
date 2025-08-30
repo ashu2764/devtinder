@@ -1,37 +1,55 @@
 import express from 'express';
-import { adminAuthMiddleware } from './middleware/adminAuth.middleware.js';
+// import { adminAuthMiddleware } from './middleware/adminAuth.middleware.js';
+import { User } from './models/user.model.js';
+
+
 const app = express();
 
-const PORT = process.env.PORT || 3000;
 
-app.use('/admin', adminAuthMiddleware);
-
-// app.use("/test", (req, res)=>{
-//     res.send("Hello World! This is DevTinder");
-// })
-
-app.get('/admin/login', (req, res)=>{
+app.post("/signup", async (req, res)=>{
     try {
+        const userObj = {
+            firstName: "Virat",
+            lastName: "Kumar",
+            email: "itsashu111@gmail.com",
+            password: "Ashu1234",
+            age: 21,
+            gender:"M"
+        }
 
-        console.log("Admin login route accessed");
-         res.send("Admin Login Successful");
+        const user = await User.create(userObj);
+        await user.save();
+        res.status(201).json({
+            message: "User created successfully",
+            user
+        })  
         
     } catch (error) {
-        console.error("Error during admin login:", error);
-        res.status(500).send("Internal Server Error");
+        res.status(400).json({
+            message: "Something went wrong while creating user",
+            error: error.message
+        })
     }
-   
 })
 
-app.get("/hello", (req, res)=>{
-    res.send("Welcome to DevTinder");   
+app.get('/getdata', async(req, res)=>{
+    try {
+        const user = await User.find();
+        res.status(201).json({
+            message: "User data fetched successfully",
+            user
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "Something went wrong while fetching user data",
+            error: error.message
+        })
+    }
+
 })
 
-app.use('/', (err, req,res,next) =>{
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
-});
 
-app.listen(PORT, () =>{
-    console.log(`Server is running on port ${PORT}`);
-})
+
+
+
+export default app;
