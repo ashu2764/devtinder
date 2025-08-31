@@ -60,6 +60,10 @@ app.put("/user/:id", async (req, res) => {
             return res.status(400).json({ message: "Invalid updates! Please update only allowed fields" })
         }
         const id = req.params.id;
+        const validateId = await User.findById(id);
+        if(!validateId){
+            return res.status(404).json({ message: "User not found" })
+        }
         const updateUser = await User.findByIdAndUpdate(id, req.body, { new: true });
         res.status(201).json({ message: "User updated Successfully", updateUser })
     } catch (error) {
@@ -71,6 +75,10 @@ app.put("/user/:id", async (req, res) => {
 app.delete("/user/:id", async (req, res) => {
     try {
         const id = req.params.id;
+        const validateId = await User.findById(id);
+        if (!validateId) {
+            return res.status(404).json({ message: "User not found" })
+        }
         const deleteUser = await User.findByIdAndDelete(id);
         res.status(201).json({ message: "User deleted Successfully" })
     } catch (error) {
