@@ -53,7 +53,13 @@ app.get("/user/:id", async (req,res)=>{
 
 app.put("/user/:id", async (req, res)=>{
     try {
-        const id  = req.params.id;
+        const AllowedUpdates = ["firstName","lastName", "password", "age", "skills", "photoUrl"];
+        const requestedUpdates = Object.keys(req.body);
+        const isValidOperation = requestedUpdates.every((update)=> AllowedUpdates.includes(update));
+        if(!isValidOperation){
+            return res.status(400).json({message:"Invalid updates! Please update only allowed fields"})
+        }
+        const id  = req.params.id;       
         const updateUser = await User.findByIdAndUpdate(id, req.body, {new:true});
         res.status(201).json({message:"User updated Successfully", updateUser})
     } catch (error) {
